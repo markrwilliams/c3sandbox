@@ -4,9 +4,9 @@ height = 480;
 
 
 var svg = d3.select('body')
-  .append('svg')
-  .attr('width', width)
-  .attr('height', height);
+    .append('svg')
+    .attr('width', width)
+    .attr('height', height);
 
 // set up initial nodes and links
 //  - nodes are known by 'id', not by index in array.
@@ -20,7 +20,7 @@ function draw_path(nodes) {
     for (i = 1; i < nodes.length; i++) {
         cur = nodes[i];
         edges.push({source: prev, target: cur, left: false, right: true,
-                   linearized: true});
+                    linearized: true});
         prev = cur;
     }
     return edges;
@@ -39,7 +39,7 @@ function calculate_links(classes) {
 var nodes = [], links = [], node_env = {}, force;
 
 
-    // define arrow markers for graph links
+// define arrow markers for graph links
 svg.append('svg:defs').append('svg:marker')
     .attr('id', 'end-arrow')
     .attr('viewBox', '0 -5 10 10')
@@ -47,7 +47,7 @@ svg.append('svg:defs').append('svg:marker')
     .attr('markerWidth', 3)
     .attr('markerHeight', 3)
     .attr('orient', 'auto')
-  .append('svg:path')
+    .append('svg:path')
     .attr('d', 'M0,-5L10,0L0,5')
     .attr('fill', '#000');
 
@@ -58,7 +58,7 @@ svg.append('svg:defs').append('svg:marker')
     .attr('markerWidth', 3)
     .attr('markerHeight', 3)
     .attr('orient', 'auto')
-  .append('svg:path')
+    .append('svg:path')
     .attr('d', 'M10,-5L0,0L10,5')
     .attr('fill', '#000');
 
@@ -69,7 +69,7 @@ svg.append('svg:defs').append('svg:marker')
     .attr('markerWidth', 2)
     .attr('markerHeight', 2)
     .attr('orient', 'auto')
-  .append('svg:path')
+    .append('svg:path')
     .attr('d', 'M10,-5L0,0L10,5')
     .attr('fill', 'red');
 
@@ -80,24 +80,24 @@ svg.append('svg:defs').append('svg:marker')
     .attr('markerWidth', 3)
     .attr('markerHeight', 3)
     .attr('orient', 'auto')
-  .append('svg:path')
+    .append('svg:path')
     .attr('d', 'M0,-5L10,0L0,5')
     .attr('fill', 'red');
 
 // line displayed when dragging new nodes
 var drag_line = svg.append('svg:path')
-  .attr('class', 'link dragline hidden')
-  .attr('d', 'M0,0L0,0');
+    .attr('class', 'link dragline hidden')
+    .attr('d', 'M0,0L0,0');
 
 // handles to link and node element groups
 var path = svg.append('svg:g').selectAll('path'),
-    circle = svg.append('svg:g').selectAll('g');
+circle = svg.append('svg:g').selectAll('g');
 
 // update force layout (called automatically each iteration)
 function tick(e) {
-//  draw directed edges with proper padding from node centers
-  path.attr('d', function(d) {
-    var deltaX = d.target.x - d.source.x,
+    //  draw directed edges with proper padding from node centers
+    path.attr('d', function(d) {
+        var deltaX = d.target.x - d.source.x,
         deltaY = d.target.y - d.source.y,
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
         normX = deltaX / dist,
@@ -108,16 +108,16 @@ function tick(e) {
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
         targetY = d.target.y - (targetPadding * normY);
-    return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
-  });
+        return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
+    });
 
 
     circle.attr('transform', function(d) {
         d.y += (d.rank - d.y) * e.alpha;
-        d.x += (width / 2 - d.x) * e.alpha;
+        d.x += ((width / 2) - d.x) * e.alpha;
         // console.log(d.y);
-      return 'translate(' + d.x + ',' + d.y + ')';
-  });
+        return 'translate(' + d.x + ',' + d.y + ')';
+    });
 
 }
 
@@ -128,66 +128,77 @@ function restart() {
         .gravity(0)
         .links(links)
         .size([width, height])
-        .linkDistance(150)
-        .charge(-1000)
+        .linkStrength(function (l) { return l.linearized ? 0 : 1; })
+        .linkDistance(100)
+        .charge(-5000)
         .on('tick', tick);
 
-  // path (link) group
-  path = path.data(links);
+    // path (link) group
+    path = path.data(links);
 
-  // add new links
-  path.enter().append('svg:path')
-    .attr('class', function(d) {
-        return d.linearized ? "linearized" : "link";
-    })
-    .style('marker-start', function(d) {
-        var linearization = d.linearized ? '-linearized' : '';
-        return d.left ? 'url(#start-arrow' + linearization + ')' : '';
-    }).style('marker-end', function(d) {
-        var linearization = d.linearized ? '-linearized' : '';
-        return d.right ? 'url(#end-arrow' + linearization + ')' : '';
-    });
+    // add new links
+    path.enter().append('svg:path')
+        .attr('class', function(d) {
+            return d.linearized ? "linearized" : "link";
+        })
+        .style('marker-start', function(d) {
+            var linearization = d.linearized ? '-linearized' : '';
+            return d.left ? 'url(#start-arrow' + linearization + ')' : '';
+        }).style('marker-end', function(d) {
+            var linearization = d.linearized ? '-linearized' : '';
+            return d.right ? 'url(#end-arrow' + linearization + ')' : '';
+        });
 
-  // remove old links
-  path.exit().remove();
+    // remove old links
+    path.exit().remove();
 
 
-  // circle (node) group
-  // NB: the function arg is crucial here! nodes are known by id, not by index!
-  circle = circle.data(nodes, function(d) { return d.id; });
+    // circle (node) group
+    // NB: the function arg is crucial here! nodes are known by id, not by index!
+    circle = circle.data(nodes, function(d) { return d.id; });
 
-  // update existing nodes
-  circle.selectAll('circle')
+    // update existing nodes
+    circle.selectAll('circle')
         .style('fill', 'white');
 
 
-  // add new nodes
-  var g = circle.enter().append('svg:g');
+    // add new nodes
+    var g = circle.enter().append('svg:g');
 
-  g.append('svg:circle')
-    .attr('class', 'node')
-    .attr('r', 12)
-    .style('fill', function(d) { return 'white'; })
+    g.append('svg:circle')
+        .attr('class', 'node')
+        .attr('r', 12)
+        .style('fill', function(d) { return 'white'; })
         .style('stroke', function(d) { return d3.rgb('gray').darker().toString(); })
-    .on("mousedown", function (d) {
-        links = calculate_links(nodes);
-        links.push.apply(links, draw_path(c3(node_env[d.id])));
-        restart();
-        return false;
-    });
+        .on("mousedown", function (d) {
+            links = calculate_links(nodes);
+            links.push.apply(links, draw_path(c3(node_env[d.id])));
+            restart();
+            return false;
+        });
 
-  // show node IDs
-  g.append('svg:text')
-      .attr('x', 0)
-      .attr('y', 4)
-      .attr('class', 'id')
-      .text(function(d) { return d.id; });
+    // show node IDs
+    g.append('svg:text')
+        .attr('x', 0)
+        .attr('y', 4)
+        .attr('class', 'id')
+        .text(function(d) { return d.id; });
 
-  // remove old nodes
-  circle.exit().remove();
+    // remove old nodes
+    circle.exit().remove();
 
-  // set the graph in motion
-  force.start();
+    var safety = 0;
+
+    // set the graph in motion
+    force.start();
+    while (force.alpha() > 0.05) {
+        force.tick();
+        if (safety++ > 500) {
+            break;
+        }
+    }
+    force.stop();
+
 }
 
 function linearize_from(cls) {

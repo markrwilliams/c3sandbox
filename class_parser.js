@@ -15,8 +15,8 @@ var class_parser = PEG.buildParser(class_grammar);
 
 function determine_rank(node) {
     if (!node.bases.length)
-        return 60;
-    return 100 + Math.min.apply(null, node.bases.map(determine_rank));
+        return 150;
+    return 50 + Math.min.apply(null, node.bases.map(determine_rank));
 }
 
 function eval_nodes(txt) {
