@@ -108,7 +108,9 @@ function tick(e) {
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
         targetY = d.target.y - (targetPadding * normY);
-        return 'M' + sourceX + ',' + sourceY + 'A' + dist + "," + dist + " 0 0,1 " + targetX + ',' + targetY;
+        if (d.linearized)
+            return 'M' + sourceX + ',' + sourceY + 'A' + dist + "," + dist + " 0 0,1 " + targetX + ',' + targetY;
+        return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
     });
 
 
