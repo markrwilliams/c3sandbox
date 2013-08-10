@@ -102,8 +102,8 @@ function tick(e) {
         dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY),
         normX = deltaX / dist,
         normY = deltaY / dist,
-        sourcePadding = d.left ? 17 : 12,
-        targetPadding = d.right ? 17 : 12,
+        sourcePadding = d.left ? 22 : 20,
+        targetPadding = d.right ? 22 : 20,
         sourceX = d.source.x + (sourcePadding * normX),
         sourceY = d.source.y + (sourcePadding * normY),
         targetX = d.target.x - (targetPadding * normX),
@@ -129,7 +129,7 @@ function restart() {
         .links(links)
         .size([width, height])
         .linkStrength(function (l) { return l.linearized ? 0 : 1; })
-        .linkDistance(100)
+        .linkDistance(20)
         .charge(-5000)
         .on('tick', tick);
 
@@ -167,9 +167,9 @@ function restart() {
 
     g.append('svg:circle')
         .attr('class', 'node')
-        .attr('r', 12)
+        .attr('r', 20)
         .style('fill', function(d) { return 'white'; })
-        .style('stroke', function(d) { return d3.rgb('gray').darker().toString(); })
+        .style('stroke', function(d) { return d3.rgb('white').darker().toString(); })
         .on("mousedown", function (d) {
             var cls = node_env[d.id];
             var linearization = c3(cls);
@@ -199,9 +199,9 @@ function restart() {
 
     // set the graph in motion
     force.start();
-    while (force.alpha() > 0.05) {
+    while (force.alpha() > 0.0000001) {
         force.tick();
-        if (safety++ > 500) {
+        if (safety++ > 100000) {
             break;
         }
     }
