@@ -14,7 +14,7 @@ svg:not(.active):not(.ctrl) {
 
 path.link {
   fill: none;
-  stroke: #000;
+  stroke: #333;
   stroke-width: 4px;
   cursor: default;
 }
@@ -22,8 +22,8 @@ path.link {
 path.linearized {
     fill: none;
     stroke: red;
-    stroke-width: 4px;
-    stroke-dasharray: 5,5;
+    stroke-width: 3px;
+    stroke-opacity: .5;
     cursor: default;
 }
 

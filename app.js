@@ -66,8 +66,8 @@ svg.append('svg:defs').append('svg:marker')
     .attr('id', 'start-arrow-linearized')
     .attr('viewBox', '0 -5 10 10')
     .attr('refX', 4)
-    .attr('markerWidth', 3)
-    .attr('markerHeight', 3)
+    .attr('markerWidth', 2)
+    .attr('markerHeight', 2)
     .attr('orient', 'auto')
   .append('svg:path')
     .attr('d', 'M10,-5L0,0L10,5')
@@ -94,8 +94,8 @@ var path = svg.append('svg:g').selectAll('path'),
     circle = svg.append('svg:g').selectAll('g');
 
 // update force layout (called automatically each iteration)
-function tick() {
-  // draw directed edges with proper padding from node centers
+function tick(e) {
+//  draw directed edges with proper padding from node centers
   path.attr('d', function(d) {
     var deltaX = d.target.x - d.source.x,
         deltaY = d.target.y - d.source.y,
@@ -111,19 +111,25 @@ function tick() {
     return 'M' + sourceX + ',' + sourceY + 'L' + targetX + ',' + targetY;
   });
 
-  circle.attr('transform', function(d) {
-    return 'translate(' + d.x + ',' + d.y + ')';
+
+    circle.attr('transform', function(d) {
+        d.y += (d.rank - d.y) * e.alpha;
+        d.x += (width / 2 - d.x) * e.alpha;
+        // console.log(d.y);
+      return 'translate(' + d.x + ',' + d.y + ')';
   });
+
 }
 
 // update graph (called when needed)
 function restart() {
     force = d3.layout.force()
         .nodes(nodes)
+        .gravity(0)
         .links(links)
         .size([width, height])
-        .linkDistance(function (d) { return d.linearized ? 150 : 100; })
-        .charge(function (d) { return d.linearized ? -700 : -500; })
+        .linkDistance(150)
+        .charge(-1000)
         .on('tick', tick);
 
   // path (link) group
