@@ -20,6 +20,8 @@ function determine_rank(node) {
 }
 
 function eval_nodes(txt) {
+    document.getElementById("linearization").value = '';
+
     O = {id: 'O', bases: []};
     node_env = {'O': O};
     nodes = class_parser.parse(txt);

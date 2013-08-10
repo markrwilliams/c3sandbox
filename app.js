@@ -171,8 +171,16 @@ function restart() {
         .style('fill', function(d) { return 'white'; })
         .style('stroke', function(d) { return d3.rgb('gray').darker().toString(); })
         .on("mousedown", function (d) {
+            var cls = node_env[d.id];
+            var linearization = c3(cls);
+
             links = calculate_links(nodes);
-            links.push.apply(links, draw_path(c3(node_env[d.id])));
+
+            document.getElementById("linearization").value = linearization.map(function (c) {
+                return c.id;
+            }).join(' -> ');
+
+            links.push.apply(links, draw_path(linearization));
             restart();
             return false;
         });
@@ -200,9 +208,8 @@ function restart() {
     force.stop();
 
 }
-
 function linearize_from(cls) {
     links = calculate_links(nodes);
-    links.push.apply(links, draw_path(c3(cls)));
+    links.push.apply(links, draw_path(linearization));
     restart();
 }
