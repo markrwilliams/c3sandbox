@@ -201,13 +201,12 @@ function restart() {
 
     // set the graph in motion
     force.start();
-    while (force.alpha() > 0.0000001) {
+    while (force.alpha() > 0.05) {
         force.tick();
-        if (safety++ > 100000) {
+        if (safety++ > 500) {
             break;
         }
     }
-    force.stop();
 
 }
 function linearize_from(cls) {
