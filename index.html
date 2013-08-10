@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>C3 Sandbox</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <form name="class_definition" onSubmit="eval_nodes(document.class_definition.classes.value)" action="javascript:noop();">
+      <textarea rows="10" cols="40" name="classes">class F(O)
+class E(O)
+class D(O)
+class C(D,F)
+class B(E,D)
+class A(B,C)</textarea>
+      <button type="submit">Evaluate</button>
+    </form>
+  </body>
+  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="peg-0.7.0.min.js"></script>
+  <script src="c3.js"></script>
+  <script src="app.js"></script>
+  <script src="class_parser.js"></script>
+</html>

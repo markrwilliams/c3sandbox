@@ -53,13 +53,3 @@ var c3 = function (cls) {
 
     return result;
 };
-
-var O = {'name': 'O', 'bases': []};
-var F = {'name': 'F', 'bases': [O]};
-var E = {'name': 'E', 'bases': [O]};
-var D = {'name': 'D', 'bases': [O]};
-var C = {'name': 'C', 'bases': [D, F]};
-var B = {'name': 'B', 'bases': [D, E]};
-var A = {'name': 'A', 'bases': [B, C]};
-
-alert(c3(A).map(function (c) { return c.name; }));
