@@ -1,49 +1,51 @@
-var CyclicalClassError;
+class_parser = (function () {
+    var CyclicalClassError = {}, UnknownClassError = {};
 
-var class_grammar = ['classes = c:(class_def ws)+ { return c.map(function (el) { return el[0]; }); }',
-                     'class_def = "class" ws name:name bases:els { return {id: name, bases: bases} }',
-                     'name = first:([_a-zA-Z]) rest:([_a-zA-Z0-9])* { return first +  rest.join(""); }',
-                     'ws = [ \\t\\n]*',
-                     "els = '(' ws first:name* rest:(',' ws name)* ws ')' {",
-                     "        var head = [first];",
-                     "        rest.forEach(function (el) {",
-                     "                       head.push(el[2]);",
-                     "                    });",
-                     "        return head; }"].join("\n");
+    var grammar = 'classes = c:(class_def ws)+ { return c.map(function (el) { return el[0]; }); }\n' +
+            'class_def = "class" ws name:name bases:els { return {name: name, bases: bases} }\n' +
+            'name = first:([_a-zA-Z]) rest:([_a-zA-Z0-9])* { return first +  rest.join(""); }\n' +
+            'ws = [ \\t\\n]*\n' +
+            "els = '(' ws first:name* rest:(',' ws name)* ws ')' { " +
+            "        var head = [first];" +
+            "        rest.forEach(function (el) {" +
+            "                       head.push(el[2]);" +
+            "                    });" +
+            "        return head; }";
 
-var class_parser = PEG.buildParser(class_grammar);
+    var parser = PEG.buildParser(grammar);
 
-function determine_rank(node) {
-    if (!node.bases.length)
-        return 150;
-    return 50 + Math.min.apply(null, node.bases.map(determine_rank));
-}
+    var determine_rank = function (cls) {
+        if (!cls.bases.length)
+            return 150;
+        return 50 + Math.min.apply(null, cls.bases.map(determine_rank));
+    };
 
-function eval_nodes(txt) {
-    document.getElementById("linearization").value = '';
+    var from_string = function (txt) {
+        var classes = parser.parse(txt),
+            env = {'object': {name: 'object', bases: []}};
+        classes.unshift(env.object);
 
-    O = {id: 'object', bases: []};
-    node_env = {'object': O};
-    nodes = class_parser.parse(txt);
-    nodes.unshift(O);
+        classes.forEach(
+            function (c) {
+                env[c.name] = c;
+            });
 
-    nodes.forEach(
-        function (n) {
-            node_env[n.id] = n;
+        classes.forEach(function (c, idx) {
+            var i, other_i, bases = c.bases;
+            for (i = 0; i < bases.length; i++) {
+                bases[i] = env[bases[i]];
+                if (bases[i] === c)
+                    throw CyclicalClassError;
+                else if ((other_i = classes.indexOf(bases[i]) >= idx) || other_i === -1)
+                    throw UnknownClassError;
+            }
+            c.rank = determine_rank(c);
         });
 
-    nodes.forEach(function (n, idx) {
-        var i, bases = n.bases;
-        for (i = 0; i < bases.length; i++) {
-            if (nodes.indexOf(bases[i]) >= idx)
-                throw CyclicalClassError;
-            bases[i] = node_env[bases[i]];
-        }
-        n.rank = determine_rank(n);
-    });
-    links = calculate_links(nodes);
-    restart();
-    return false;
-}
+        return classes;
+    };
 
-function noop() { return false; }
+    return {from_string: from_string,
+            CyclicalClassError: CyclicalClassError,
+            UnknownClassError: UnknownClassError};
+})();

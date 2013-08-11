@@ -4,11 +4,20 @@
     <meta charset="utf-8">
     <title>C3 Sandbox</title>
     <link rel="stylesheet" href="app.css">
+      <script src="jquery-2.0.3.min.js"></script>
+      <script src="d3.v3.min.js"></script>
+      <script src="peg-0.7.0.min.js"></script>
+      <script src="sprintf.min.js"></script>
+
+      <script src="class_hierarchy.js"></script>
+      <script src="class_parser.js"></script>
+      <script src="c3.js"></script>
+      <script src="app.js"></script>
   </head>
   <body>
     <input id="linearization" style="width: 400px;" type="text" value=""/>
-    <form name="class_definition" onSubmit="eval_nodes(document.class_definition.classes.value)" action="javascript:noop();">
-      <textarea rows="10" cols="40" name="classes">class F(object)
+    <form id="class-form" action="javascript:void(0)">
+      <textarea rows="10" cols="40" id="classes">class F(object)
 class E(object)
 class D(object)
 class C(D,F)
@@ -16,10 +25,6 @@ class B(E,D)
 class A(B,C)</textarea>
       <button type="submit">Evaluate</button>
     </form>
+    <div id="visualization"></div>
   </body>
-  <script src="d3.v3.min.js"></script>
-  <script src="peg-0.7.0.min.js"></script>
-  <script src="c3.js"></script>
-  <script src="app.js"></script>
-  <script src="class_parser.js"></script>
 </html>
