@@ -33,8 +33,8 @@ var class_hierarchy = (function () {
                             markerHeight: 5,
                             fill: 'red'});
 
-            path = svg.append('svg:g').selectAll('path'),
-            circle = svg.append('svg:g').selectAll('g');
+            path = svg.selectAll('path'),
+            circle = svg.selectAll('circle').data(_classes);
             return self;
         };
 
@@ -128,6 +128,7 @@ var class_hierarchy = (function () {
                     source_y = d.source.y + (source_padding * y),
                     target_x = d.target.x - (target_padding * x),
                     target_y = d.target.y - (target_padding * y);
+                console.log(x);
                 if (d.linearized)
                     return sprintf(['M%f,%f', 'A%f,%f 0 0,1 %f,%f'].join(''),
                                    source_x, source_y, dist, dist, target_x, target_y);
@@ -136,12 +137,8 @@ var class_hierarchy = (function () {
             });
 
             // attract classes to their rank
-            circle.attr('transform', function(d) {
-                d.y += (d.rank - d.y) * e.alpha;
-                d.x += ((width / 2) - d.x) * e.alpha;
-                return 'translate(' + d.x + ',' + d.y + ')';
-            });
-
+            circle.attr('cx', function(d) { d.x += (width / 2 - d.x) * e.alpha; return d.x;});
+            circle.attr('cy', function(d) { d.y += (d.rank - d.y) * e.alpha; return d.y; });
         };
 
         var draw_linearization = function (classes) {
