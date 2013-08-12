@@ -1,11 +1,12 @@
 var class_hierarchy = (function () {
+
     var ClassHierarchy = function () {
         var svg,
             width = 800, height = 600,
             _classes = [],
             _edges = [],
             _env = {},
-            force,              // d3 force layout object
+            _force,             // d3 force layout object
             path,               // path along which to draw graph
             circle,             // class circle group
             radius = 20,        // radius of class circles
@@ -54,7 +55,6 @@ var class_hierarchy = (function () {
         var edges = function (args) {
             if (!args)
                 return _edges;
-            var additional = args.additional || [];
 
             _edges = args.classes.reduce(
                 function (sofar, cls) {
@@ -64,10 +64,27 @@ var class_hierarchy = (function () {
                         });
                     return sofar;
                 },
-                additional).reverse(); // this affects whether or not
-                                       // it's considered linearized!
+                []);
 
             return _edges;
+        };
+
+        var force = function () {
+            return _force || (_force = d3.layout.force()
+                              .nodes(_classes)
+                              .gravity(0)     // only rank attraction
+                              .links(_edges)
+                              .size([width, height])
+                              .linkStrength(function (l) { return l.linearized ? 0 : 1; })
+                              .linkDistance(20) // a very short link distance...
+                              .charge(-5000)    // ...and a very negative charge...
+                              .on('tick', tick)); // ..creates a
+                                                  // tension that
+                                                  // ensures the graph
+                                                  // is horizontally
+                                                  // (and predictably)
+                                                  // spread/ along
+                                                  // class ranks
         };
 
         var linearization = function (args) {
@@ -142,7 +159,8 @@ var class_hierarchy = (function () {
         var linearize_from = function (d) {
             var cls = _env[d.name];
 
-            edges({classes: _classes, additional: draw_linearization(last_linearization = c3.linearize(cls))});
+            _edges = _edges.filter(function (el) { return !el.linearized; });
+            _edges.push.apply(_edges, draw_linearization(last_linearization = c3.linearize(cls)));
             draw();
             on_linearization();
             return false;
@@ -152,24 +170,13 @@ var class_hierarchy = (function () {
         var draw = function (args) {
             var g, safety = 0;
 
-            if (args && args.classes)
+            if (args && args.classes) {
+                _force = null;
                 classes(args);
-
-            force = d3.layout.force()
-                .nodes(_classes)
-                .gravity(0)     // only rank attraction
-                .links(_edges)
-                .size([width, height])
-                .linkStrength(function (l) { return l.linearized ? 0 : 1; })
-                .linkDistance(20) // a very short link distance...
-                .charge(-5000)    // ...and a very negative charge...
-                .on('tick', tick); // ..creates a tensions that
-                                   // ensures the graph is
-                                   // horizontally (and predictably)
-                                   // spread along class ranks
+            }
 
             // add edges
-            path = path.data(edges);
+            path = path.data(edges());
             path.enter().append('svg:path')
                 .attr('class', function (d) {
                     return d.linearized ? "linearized" : "link";
@@ -182,7 +189,7 @@ var class_hierarchy = (function () {
             path.exit().remove();
 
             // associate circles with class names
-            circle = circle.data(classes, function (c) { return c.name; });
+            circle = circle.data(classes(), function (c) { return c.name; });
 
             // update current circles
             circle.selectAll('circle')
@@ -208,13 +215,9 @@ var class_hierarchy = (function () {
             circle.exit().remove();
 
             // set the graph in motion, bailing if we had no luck
-            // if (last_linearization) {
-            //     console.log("SDF");
-            //     return {};
-            // }
-            force.start();
-            while (force.alpha() > 0.05) {
-                force.tick();
+            force().start();
+            while (force().alpha() > 0.05) {
+                force().tick();
                 if (safety++ > 500) {
                     break;
                 }
