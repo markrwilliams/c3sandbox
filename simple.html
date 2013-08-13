@@ -1,7 +1,15 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <title>C3 Sandbox</title>
+<link rel="stylesheet" href="c3sandbox.css">
+<script type="text/javascript">
+var c3sandbox = {};
+</script>
 <body>
 <script src="d3.v3.min.js"></script>
 <script src="sprintf.min.js"></script>
-<script type="text/javascript" src="simple.js"></script>
+<script src="simple.js"></script>
+<script type="text/javascript">
+  var renderer = new c3sandbox.render.RendersHierarchy({height: 400, width: 600});
+  renderer.draw();
+</script>

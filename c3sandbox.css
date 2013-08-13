@@ -1,0 +1,14 @@
+.link-edge {
+    stroke: black;
+    stroke-width: 3;
+}
+
+.linearized-arrow {
+    stroke: red;
+    stroke-width: 2;
+}
+
+.class-node-circle {
+    stroke: black;
+    fill: white;
+};
