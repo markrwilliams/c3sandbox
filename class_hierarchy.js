@@ -9,7 +9,7 @@ var class_hierarchy = (function () {
             _force,             // d3 force layout object
             path,               // path along which to draw graph
             circle,             // class circle group
-            radius = 20,        // radius of class circles
+            radius = 25,        // radius of class circles
             darker_white = d3.rgb('white').darker().toString(),
             last_linearization = [],
             on_linearization = null,

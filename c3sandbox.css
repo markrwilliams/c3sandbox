@@ -19,3 +19,13 @@
     stroke: black;
     fill: white;
 };
+
+
+text {
+    font: 12px sans-serif;
+}
+
+text.node-text {
+    text-anchor: middle;
+    font-weight: bold;
+}

@@ -35,7 +35,7 @@ c3sandbox.render = {
                                                  fill: 'red'});
 
         var offset = args.offset || 50;
-        var radius = 20;
+        var radius = 22;
 
         var determine_rank = function (c) {
             if (!c.bases.length)
@@ -76,7 +76,7 @@ c3sandbox.render = {
                 .links(edges)
                 .size([width, height])
                 .charge(-5000)
-                .linkDistance(30);
+                .linkDistance(10);
         });
 
 
@@ -141,7 +141,6 @@ c3sandbox.render = {
             link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
             class_node = class_node.data(classes, function (d) { return d.name; });
 
-
             link.enter().append('path')
                 .attr('class', choose_link_class)
                 .style('marker-end', choose_link_arrow);
@@ -157,8 +156,9 @@ c3sandbox.render = {
                 .on('mousedown', linearize_from);
 
             class_node_group.append('text')
-                .attr('x', -6)
-                .attr('y', 3)
+                .attr('x', 0)
+                .attr('y', 4)
+                .attr('class', 'node-text')
                 .text(function (d) { return d.name; });
             class_node.exit().remove();
 
