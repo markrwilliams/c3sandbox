@@ -8,8 +8,21 @@ var c3sandbox = {};
 <body>
 <script src="d3.v3.min.js"></script>
 <script src="sprintf.min.js"></script>
+<script src="c3.js"></script>
 <script src="simple.js"></script>
 <script type="text/javascript">
+
+  // replace me
+  var env = {};
+  env.O = {name: 'O', bases: []};
+  env.F = {name: 'F', bases: [env.O]};
+  env.E = {name: 'E', bases: [env.O]};
+  env.D = {name: 'D', bases: [env.O]};
+  env.C = {name: 'C', bases: [env.D, env.F]};
+  env.B = {name: 'B', bases: [env.D, env.E]};
+  env.A = {name: 'A', bases: [env.B, env.C]};
+
+
   var renderer = new c3sandbox.render.RendersHierarchy({height: 400, width: 600});
-  renderer.draw();
+  renderer.render_from({environment: env});
 </script>

@@ -1,5 +1,5 @@
 c3sandbox.render = {
-    bind: function (instance, f) {
+    $m: function (instance, f) {
         return function () {
             return f.apply(instance, arguments);
         };
@@ -21,7 +21,7 @@ c3sandbox.render = {
     },
 
     RendersHierarchy: function (args) {
-        var render = c3sandbox.render;
+        var render = c3sandbox.render, $m = render.$m;
         var height = args.height, width = args.width;
 
         this.svg = d3.select('body').append('svg')
@@ -34,18 +34,8 @@ c3sandbox.render = {
                                                  id: 'end-arrow-linearized',
                                                  fill: 'red'});
 
-        var offset = args.offset || 100;
+        var offset = args.offset || 50;
         var radius = 20;
-
-        // replace me
-        this.env = {};
-        this.env.O = {name: 'O', bases: []};
-        this.env.F = {name: 'F', bases: [this.env.O]};
-        this.env.E = {name: 'E', bases: [this.env.O]};
-        this.env.D = {name: 'D', bases: [this.env.O]};
-        this.env.C = {name: 'C', bases: [this.env.D, this.env.F]};
-        this.env.B = {name: 'B', bases: [this.env.D, this.env.E]};
-        this.env.A = {name: 'A', bases: [this.env.B, this.env.C]};
 
         var determine_rank = function (c) {
             if (!c.bases.length)
@@ -53,20 +43,42 @@ c3sandbox.render = {
             return 1 + Math.min.apply(null, c.bases.map(determine_rank));
         };
 
-        var classes = [], edges = [], key, c;
-        for (key in this.env) {
-            if (this.env.hasOwnProperty(key)) {
-                classes.push(c = this.env[key]);
-                c.rank = determine_rank(c);
+        var classes = [], edges = [];
+
+        this.update = $m(this, function (args) {
+            this.environment = args.environment;
+            var key, c, ranks = {}, num_ranks = 0;
+
+            for (key in this.environment) {
+                if (!this.environment.hasOwnProperty(key))
+                    continue;
+
+                classes.push(c = this.environment[key]);
+                ranks[c.rank = determine_rank(c)] = true;
                 c.bases.forEach(function (b) {
                     edges.push({source: b, target: c});
                 });
             }
-        }
 
-        classes.forEach(function (c) {
-            c.rank = offset + c.rank * height / classes.length;
+            for (key in ranks) {
+                if (!ranks.hasOwnProperty(key))
+                    continue;
+
+                ++num_ranks;
+            }
+
+            classes.forEach(function (c) {
+                c.rank = offset + c.rank * height / num_ranks;
+            });
+
+            this.force = d3.layout.force()
+                .nodes(classes)
+                .links(edges)
+                .size([width, height])
+                .charge(-5000)
+                .linkDistance(30);
         });
+
 
         var choose_link_arrow = function (d) {
             return d.linearized ? linearized_arrow.url : normal_arrow.url;
@@ -87,8 +99,6 @@ c3sandbox.render = {
         };
 
         var create_link_d = function (d) {
-            if (d.source.name === 'O')
-                console.log(sprintf("%s -> %s", d.source.name, d.target.name));
             var h = hypotenuse(d.source, d.target);
             var from_x = d.source.x,
                 from_y = d.source.y,
@@ -101,49 +111,81 @@ c3sandbox.render = {
                            from_x, from_y, to_x, to_y);
         };
 
+
         var link = this.svg.append('g')
                 .attr('class', 'links-group')
-                .selectAll('path').data(edges);
+                .selectAll('path');
 
         var class_node = this.svg.append('g')
                 .attr('class', 'class-nodes')
-                .selectAll('g').data(classes);
+                .selectAll('g');
 
-        this.draw = render.bind(this, function () {
-            link.enter().append('path')
+        var linearize_from = $m(this, function (d) {
+            var cls = this.environment[d.name];
+
+            e = edges;
+            edges = edges.filter(function (el) { return !el.linearized; });
+
+            var linearized = c3.linearize(cls), prev = linearized[0], i, cur;
+            for (i = 1; i < linearized.length; i++) {
+                cur = linearized[i];
+                edges.push({source: prev, target: cur, linearized: true});
+                prev = cur;
+            }
+
+            edges = [];
+            this.render();
+            return false;
+        });
+
+        this.render = $m(this, function () {
+            var link_join = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; }),
+                class_node_join = class_node.data(classes, function (d) { return d.name; });
+
+
+            link_join.enter().append('path')
                 .attr('class', choose_link_class)
                 .style('marker-end', choose_link_arrow);
 
-            link.exit().remove();
+            link_join.exit().remove();
 
-            class_node.selectAll('circle');
+            class_node_join.selectAll('circle');
 
-            var class_node_group = class_node.enter().append('g');
+            var class_node_group = class_node_join.enter().append('g');
             class_node_group.append('circle')
                 .attr('class', 'class-node-circle')
-                .attr('r', radius);
+                .attr('r', radius)
+                .on('mousedown', linearize_from);
 
             class_node_group.append('text')
                 .attr('x', -6)
                 .attr('y', 3)
                 .text(function (d) { return d.name; });
-            class_node.exit().remove();
+            class_node_join.exit().remove();
 
-            this.force = d3.layout.force()
-                .nodes(classes)
-                .links(edges)
-                .size([width, height])
-                .charge(-5000)
-                .linkDistance(30)
-                .on('tick', function (e) {
-                    link.attr('d', create_link_d);
-                    class_node.attr('transform', function (d) {
+            this.force.on('tick', function (e) {
+                    link_join.attr('d', create_link_d);
+                    class_node_join.attr('transform', function (d) {
                         return sprintf('translate(%f, %f)',
                                        d.x += (width / 2 - d.x) * e.alpha,
                                        d.y += (d.rank - d.y) * e.alpha
                                       );
                     });
-                }).start();
+            }).start();
+
+            var safety = 0;
+            while (this.force.alpha() > 0.05) {
+                this.force.tick();
+                ++safety;
+                if (safety > 500)
+                    break;
+            }
+
+        });
+
+        this.render_from = $m(this, function (args) {
+            this.update(args);
+            this.render();
         });
     }
 };

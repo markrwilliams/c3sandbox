@@ -1,6 +1,13 @@
 .link-edge {
+    fill: none;
     stroke: black;
     stroke-width: 3;
+}
+
+.linearized-edge {
+    fill: none;
+    stroke: red;
+    stroke-width: 2;
 }
 
 .linearized-arrow {
