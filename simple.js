@@ -133,25 +133,24 @@ c3sandbox.render = {
                 prev = cur;
             }
 
-            edges = [];
             this.render();
             return false;
         });
 
         this.render = $m(this, function () {
-            var link_join = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; }),
-                class_node_join = class_node.data(classes, function (d) { return d.name; });
+            link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
+            class_node = class_node.data(classes, function (d) { return d.name; });
 
 
-            link_join.enter().append('path')
+            link.enter().append('path')
                 .attr('class', choose_link_class)
                 .style('marker-end', choose_link_arrow);
 
-            link_join.exit().remove();
+            link.exit().remove();
 
-            class_node_join.selectAll('circle');
+            class_node.selectAll('circle');
 
-            var class_node_group = class_node_join.enter().append('g');
+            var class_node_group = class_node.enter().append('g');
             class_node_group.append('circle')
                 .attr('class', 'class-node-circle')
                 .attr('r', radius)
@@ -161,11 +160,11 @@ c3sandbox.render = {
                 .attr('x', -6)
                 .attr('y', 3)
                 .text(function (d) { return d.name; });
-            class_node_join.exit().remove();
+            class_node.exit().remove();
 
             this.force.on('tick', function (e) {
-                    link_join.attr('d', create_link_d);
-                    class_node_join.attr('transform', function (d) {
+                    link.attr('d', create_link_d);
+                    class_node.attr('transform', function (d) {
                         return sprintf('translate(%f, %f)',
                                        d.x += (width / 2 - d.x) * e.alpha,
                                        d.y += (d.rank - d.y) * e.alpha
