@@ -7,10 +7,10 @@ $(document).ready(function() {
 
     classes.data('hierarchy', new c3sandbox.render.RendersHierarchy(
         {svg: d3.select('#visualization').append('svg')
-         .attr('width', 400)
-         .attr('height', 450),
-         width: 400,
-         height: 450,
+         .attr('width', 800)
+         .attr('height', 800),
+         width: 800,
+         height: 800,
          after_linearization: update_input}));
 
     $("#class-form").submit(function (e) {

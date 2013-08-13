@@ -78,7 +78,7 @@ c3sandbox.render = {
                 .nodes(classes)
                 .links(edges)
                 .size([width, height])
-                .charge(-7000)
+                .charge(-5000)
                 .linkDistance(10);
         });
 

@@ -22,7 +22,16 @@ class E(object)
 class D(object)
 class C(D,F)
 class B(E,D)
-class A(B,C)</textarea>
+class A(B,C)
+class boat(object)
+class wheel_boat(object)
+class day_boat(boat)
+class engineless(day_boat)
+class pedal_wheel_boat(engineless, wheel_boat)
+class small_multihull(day_boat)
+class small_catamaran(small_multihull)
+class pedalo(pedal_wheel_boat, small_catamaran)
+</textarea>
       <button type="submit">Evaluate</button>
     </form>
     <div id="visualization"></div>
