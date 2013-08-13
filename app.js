@@ -8,9 +8,9 @@ $(document).ready(function() {
     classes.data('hierarchy', new c3sandbox.render.RendersHierarchy(
         {svg: d3.select('#visualization').append('svg')
          .attr('width', 400)
-         .attr('height', 400),
+         .attr('height', 450),
          width: 400,
-         height: 400,
+         height: 450,
          after_linearization: update_input}));
 
     $("#class-form").submit(function (e) {
