@@ -22,11 +22,10 @@ c3sandbox.render = {
 
     RendersHierarchy: function (args) {
         var render = c3sandbox.render, $m = render.$m;
-        var height = args.height, width = args.width;
 
-        this.svg = d3.select('body').append('svg')
-            .attr('width', width)
-            .attr('height', height);
+        this.svg = args.svg;
+        var height = args.height, width = args.width;
+        this.after_linearization = args.after_linearization || function () {};
 
         var normal_arrow = new render.Arrow({svg: this.svg,
                                              id: 'end-arrow'}),
@@ -43,10 +42,14 @@ c3sandbox.render = {
             return 1 + Math.min.apply(null, c.bases.map(determine_rank));
         };
 
-        var classes = [], edges = [];
+        var classes, edges;
 
         this.update = $m(this, function (args) {
             this.environment = args.environment;
+            this.svg;
+
+            classes = [], edges = [];
+
             var key, c, ranks = {}, num_ranks = 0;
 
             for (key in this.environment) {
@@ -134,6 +137,7 @@ c3sandbox.render = {
             }
 
             this.render();
+            this.after_linearization(linearized);
             return false;
         });
 
@@ -149,7 +153,7 @@ c3sandbox.render = {
 
             class_node.selectAll('circle');
 
-            var class_node_group = class_node.enter().append('g');
+           var class_node_group = class_node.enter().append('g');
             class_node_group.append('circle')
                 .attr('class', 'class-node-circle')
                 .attr('r', radius)

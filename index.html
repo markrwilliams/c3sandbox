@@ -1,20 +1,20 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>C3 Sandbox</title>
-    <link rel="stylesheet" href="app.css">
-      <script src="jquery-2.0.3.min.js"></script>
-      <script src="d3.v3.min.js"></script>
-      <script src="peg-0.7.0.min.js"></script>
-      <script src="sprintf.min.js"></script>
+<meta charset="utf-8"></meta>
+<head>
+  <title>C3 Sandbox</title>
+  <link rel="stylesheet" href="c3sandbox.css"></link>
+  <script type="text/javascript"> var c3sandbox = {}; </script>
+  <script src="jquery-2.0.3.min.js"></script>
+  <script src="d3.v3.min.js"></script>
+  <script src="sprintf.min.js"></script>
+  <script src="peg-0.7.0.min.js"></script>
 
-      <script src="class_hierarchy.js"></script>
-      <script src="class_parser.js"></script>
-      <script src="c3.js"></script>
-      <script src="app.js"></script>
-  </head>
-  <body>
+  <script src="c3.js"></script>
+  <script src="parser.js"></script>
+  <script src="render.js"></script>
+  <script src="app.js"></script>
+</head>
+<body>
     <input id="linearization" style="width: 400px;" type="text" value=""/>
     <form id="class-form" action="javascript:void(0)">
       <textarea rows="10" cols="40" id="classes">class F(object)
@@ -26,5 +26,4 @@ class A(B,C)</textarea>
       <button type="submit">Evaluate</button>
     </form>
     <div id="visualization"></div>
-  </body>
-</html>
+</body>
