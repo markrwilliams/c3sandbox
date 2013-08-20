@@ -1,10 +1,4 @@
 c3sandbox.render = {
-    $m: function (instance, f) {
-        return function () {
-            return f.apply(instance, arguments);
-        };
-    },
-
     Arrow: function (args) {
         args.svg.append('svg:defs').append('svg:marker')
             .attr('id', args.id)
@@ -21,7 +15,7 @@ c3sandbox.render = {
     },
 
     RendersHierarchy: function (args) {
-        var render = c3sandbox.render, $m = render.$m;
+        var render = c3sandbox.render;
 
         this.svg = args.svg;
         var height = args.height, width = args.width;
@@ -44,9 +38,8 @@ c3sandbox.render = {
 
         var classes, edges;
 
-        this.update = $m(this, function (args) {
+        this.update = function (args) {
             this.environment = args.environment;
-            this.svg;
 
             classes = [], edges = [];
 
@@ -80,7 +73,7 @@ c3sandbox.render = {
                 .size([width, height])
                 .charge(-5000)
                 .linkDistance(10);
-        });
+        };
 
 
         var choose_link_arrow = function (d) {
@@ -123,7 +116,7 @@ c3sandbox.render = {
                 .attr('class', 'class-nodes')
                 .selectAll('g');
 
-        var linearize_from = $m(this, function (d) {
+        var linearize_from = function (d) {
             var cls = this.environment[d.name];
 
             e = edges;
@@ -139,9 +132,9 @@ c3sandbox.render = {
             this.render();
             this.after_linearization(linearized);
             return false;
-        });
+        }.bind(this);
 
-        this.render = $m(this, function () {
+        this.render = function () {
             link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
             class_node = class_node.data(classes, function (d) { return d.name; });
 
@@ -184,11 +177,11 @@ c3sandbox.render = {
                     break;
             }
 
-        });
+        };
 
-        this.render_from = $m(this, function (args) {
+        this.render_from = function (args) {
             this.update(args);
             this.render();
-        });
+        };
     }
 };
