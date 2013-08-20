@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <meta charset="utf-8"></meta>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
   <title>C3 Sandbox</title>
+
   <link rel="stylesheet" href="src/c3sandbox.css"></link>
+  <link rel="stylesheet" href="support/bs/css/bootstrap.min.css" media="screen"></link>
+
   <script type="text/javascript"> var c3sandbox = {}; </script>
   <script src="support/jquery-2.0.3.min.js"></script>
+  <script src="support/bs/js/bootstrap.min.js"></script>
   <script src="support/d3.v3.min.js"></script>
   <script src="support/sprintf.min.js"></script>
   <script src="support/peg-0.7.0.min.js"></script>
@@ -15,9 +20,18 @@
   <script src="src/app.js"></script>
 </head>
 <body>
-    <input id="linearization" style="width: 400px;" type="text" value=""/>
-    <form id="class-form" action="javascript:void(0)">
-      <textarea rows="10" cols="40" id="classes">class F(object)
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        <form id="class-form" action="javascript:void(0)">
+
+          <div class="panel panel-success">
+            <div class="panel-heading">Linearization</div>
+            <div class="panel-body" id="linearization">
+            </div>
+          </div>
+
+          <textarea id="classes" rows="9" class="form-control">
 class boat(object)
 class wheel_boat(object)
 class day_boat(boat)
@@ -26,8 +40,13 @@ class pedal_wheel_boat(engineless, wheel_boat)
 class small_multihull(day_boat)
 class small_catamaran(small_multihull)
 class pedalo(pedal_wheel_boat, small_catamaran)
-</textarea>
-      <button type="submit">Evaluate</button>
-    </form>
-    <div id="visualization"></div>
+            </textarea>
+          <button type="submit" class="btn btn-default">Evaluate</button>
+        </form>
+      </div>
+      <div class="col-lg-6">
+        <div id="visualization"></div>
+      </div>
+    </div>
+  </div>
 </body>

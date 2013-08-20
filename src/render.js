@@ -118,27 +118,35 @@ c3sandbox.render = {
                 .attr('class', 'class-nodes')
                 .selectAll('g');
 
-        var linearize_from = function (d) {
-            var cls = this.environment[d.name];
-
+        this.linearize_from = function (d, arg) {
             e = edges;
             edges = edges.filter(function (el) { return !el.linearized; });
 
-            var linearized = c3.linearize(cls), prev = linearized[0], i, cur;
+            var linearized = c3.linearize(d), prev = linearized[0], i, cur;
             for (i = 1; i < linearized.length; i++) {
                 cur = linearized[i];
                 edges.push({source: prev, target: cur, linearized: true});
                 prev = cur;
             }
 
+            for (var c in this.environment) {
+                if (!this.environment.hasOwnProperty(c))
+                    continue;
+                this.environment[c].selected = false;
+            }
+
+            d.selected = true;
+
             this.render();
-            this.after_linearization(linearized);
+
+            if (arg && arg.skip !== true) this.after_linearization(linearized);
+
             return false;
         }.bind(this);
 
         this.render = function () {
             link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
-            class_node = class_node.data(classes, function (d) { return d.name; });
+            class_node = class_node.data(classes, function (d) { return d.name + '-' + d.selected; });
 
             link.enter().append('path')
                 .attr('class', choose_link_class)
@@ -146,13 +154,16 @@ c3sandbox.render = {
 
             link.exit().remove();
 
-            class_node.selectAll('circle');
+            class_node.selectAll('circle').attr('class',
+                                                function (d) {
+                                                    return d.selected ? 'class-node-circle node-selected' : 'class-node-circle';
+                                                });
 
-           var class_node_group = class_node.enter().append('g');
+            var class_node_group = class_node.enter().append('g');
             class_node_group.append('circle')
-                .attr('class', 'class-node-circle')
+                .attr('class', function (d) { return d.selected ? 'class-node-circle-selected' : 'class-node-circle'; })
                 .attr('r', radius)
-                .on('mousedown', linearize_from);
+                .on('mousedown', this.linearize_from);
 
             class_node_group.append('text')
                 .attr('x', 0)

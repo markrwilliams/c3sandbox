@@ -2,7 +2,20 @@ $(document).ready(function() {
     var classes = $('#classes');
 
     var update_input = function (linearization) {
-        $("#linearization").val(linearization.map(function (c) { return c.name; }).join('->'));
+        var btns = $('<div/>', {'class': 'btn-group',
+                                'data-toggle': 'buttons'});
+        linearization.forEach(function (c) {
+            btns.append($('<label/>',
+                          {type: 'button',
+                           'class': 'btn btn-default',
+                           text: c.name,
+                           click: function (e) {
+                               classes.data('hierarchy').linearize_from(c, {'skip': true});
+                               return e;
+                           }}).append($('<input type="radio"/>')));
+        });
+
+        $("#linearization").html(btns);
     };
 
     classes.data('hierarchy', new c3sandbox.render.RendersHierarchy(

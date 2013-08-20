@@ -18,11 +18,15 @@
 .class-node-circle {
     stroke: black;
     fill: white;
-};
+}
 
+.node-selected {
+    stroke-width: 2px;
+    stroke: red;
+}
 
 text {
-    font: 12px sans-serif;
+    font: 12px monospace;
 }
 
 text.node-text {
