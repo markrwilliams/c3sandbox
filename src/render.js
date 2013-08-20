@@ -151,7 +151,7 @@ c3sandbox.render = {
         this.render = function () {
             link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
             class_node = class_node.data(classes, function (d) { return d.name + '-' + d.selected; });
-            text = text.data(classes, function (d) { return d.name; });
+            text = text.data(classes, function (d) { return d.name + '-' + d.selected; });
 
             link.enter().append('path')
                 .attr('class', choose_link_class)
@@ -159,10 +159,10 @@ c3sandbox.render = {
 
             link.exit().remove();
 
-            class_node.selectAll('circle').attr('class',
-                                                function (d) {
-                                                    return d.selected ? 'class-node-circle node-selected' : 'class-node-circle';
-                                                });
+            class_node.attr('class',
+                            function (d) {
+                                return d.selected ? 'class-node-circle node-selected' : 'class-node-circle';
+                            });
 
             class_node.enter().append('circle')
                 .attr('class', function (d) { return d.selected ? 'class-node-circle-selected' : 'class-node-circle'; })
@@ -198,7 +198,6 @@ c3sandbox.render = {
                 };
 
                 class_node.attr('transform', gravitate);
-
                 text.attr('transform', gravitate);
             }).start();
 

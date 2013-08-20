@@ -1,3 +1,11 @@
+body {
+    padding-top: 70px;
+}
+
+svg {
+    border-left: 1px solid #eee;
+}
+
 .link-edge {
     fill: none;
     stroke: #777;
@@ -40,4 +48,12 @@ text.shadow {
     stroke: white;
     stroke-width: 3px;
     stroke-opacity: .8;
+}
+
+button.evaluate {
+    margin-top: 15px;
+}
+
+textarea.form-control {
+    font: 14px monospace;
 }
