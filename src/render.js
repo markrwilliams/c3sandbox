@@ -168,8 +168,15 @@ c3sandbox.render = {
             class_node_group.append('text')
                 .attr('x', 0)
                 .attr('y', 4)
+                .attr('class', 'node-text shadow')
+                .text(function (d) { return d.name; });
+
+            class_node_group.append('text')
+                .attr('x', 0)
+                .attr('y', 4)
                 .attr('class', 'node-text')
                 .text(function (d) { return d.name; });
+
             class_node.exit().remove();
 
             this.force.on('tick', function (e) {
