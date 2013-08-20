@@ -28,7 +28,7 @@ c3sandbox.render = {
                                                  id: 'end-arrow-linearized',
                                                  fill: 'red'});
 
-        var rank_fuzz = args.rank_fuzz || 10, offset = rank_fuzz * 15;
+        var rank_fuzz = args.rank_fuzz || 9, offset = rank_fuzz * 15;
         var radius = 22;
 
         var determine_rank = function (c) {
@@ -72,7 +72,7 @@ c3sandbox.render = {
                 .nodes(classes)
                 .links(edges)
                 .size([width, height])
-                .charge(-5000)
+                .charge(-10000)
                 .linkDistance(10);
         };
 
@@ -104,7 +104,7 @@ c3sandbox.render = {
                 to_y = d.target.y + ((radius + fuzz) * (d.source.y - d.target.y) / h);
             if (d.linearized)
                 return sprintf(['M%f,%f', 'A%f,%f 0 0,1 %f,%f'].join(''),
-                               from_x, from_y, h / 2, h / 2, to_x, to_y);
+                               from_x, from_y, h * .7, h * .7, to_x, to_y);
             return sprintf(['M%f,%f', 'L%f,%f'].join(''),
                            from_x, from_y, to_x, to_y);
         };
@@ -115,7 +115,11 @@ c3sandbox.render = {
                 .selectAll('path');
 
         var class_node = this.svg.append('g')
-                .attr('class', 'class-nodes')
+                .attr('class', 'class-nodes-group')
+                .selectAll('circle');
+
+        var text = this.svg.append('g')
+                .attr('class', 'text-group')
                 .selectAll('g');
 
         this.linearize_from = function (d, arg) {
@@ -147,6 +151,7 @@ c3sandbox.render = {
         this.render = function () {
             link = link.data(edges, function (d) { return d.source.name + '-' + d.target.name; });
             class_node = class_node.data(classes, function (d) { return d.name + '-' + d.selected; });
+            text = text.data(classes, function (d) { return d.name; });
 
             link.enter().append('path')
                 .attr('class', choose_link_class)
@@ -159,38 +164,46 @@ c3sandbox.render = {
                                                     return d.selected ? 'class-node-circle node-selected' : 'class-node-circle';
                                                 });
 
-            var class_node_group = class_node.enter().append('g');
-            class_node_group.append('circle')
+            class_node.enter().append('circle')
                 .attr('class', function (d) { return d.selected ? 'class-node-circle-selected' : 'class-node-circle'; })
                 .attr('r', radius)
                 .on('mousedown', this.linearize_from);
 
-            class_node_group.append('text')
+            class_node.exit().remove();
+
+            var text_group = text.enter().append('g');
+
+            text_group.append('text')
                 .attr('x', 0)
                 .attr('y', 4)
                 .attr('class', 'node-text shadow')
                 .text(function (d) { return d.name; });
 
-            class_node_group.append('text')
+            text_group.append('text')
                 .attr('x', 0)
                 .attr('y', 4)
                 .attr('class', 'node-text')
                 .text(function (d) { return d.name; });
 
-            class_node.exit().remove();
+            text.exit().remove();
+
 
             this.force.on('tick', function (e) {
-                    link.attr('d', create_link_d);
-                    class_node.attr('transform', function (d) {
-                        return sprintf('translate(%f, %f)',
-                                       d.x += (width / 2 - d.x) * e.alpha,
-                                       d.y += (d.rank - d.y) * e.alpha
-                                      );
-                    });
+                link.attr('d', create_link_d);
+
+                var gravitate = function(d) {
+                    return sprintf('translate(%f, %f)',
+                                   d.x += (width / 2 - d.x) * e.alpha,
+                                   d.y += (d.rank - d.y) * e.alpha);
+                };
+
+                class_node.attr('transform', gravitate);
+
+                text.attr('transform', gravitate);
             }).start();
 
             var safety = 0;
-            while (this.force.alpha() > 0.03) {
+            while (this.force.alpha() > 0.05) {
                 this.force.tick();
                 ++safety;
                 if (safety > 500)

@@ -28,6 +28,7 @@
 
 text {
     font: 12px monospace;
+    pointer-events: none;
 }
 
 text.node-text {
