@@ -21,8 +21,9 @@
 }
 
 .node-selected {
-    stroke-width: 2px;
     stroke: red;
+    stroke-width: 2;
+    opacity: .7;
 }
 
 text {
