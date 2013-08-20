@@ -1,17 +1,18 @@
 c3sandbox.render = {
     Arrow: function (args) {
+        this.marker_width = args.marker_width || 5, this.marker_height = args.marker_height || 5;
+        this.url = sprintf('url(#%s)', args.id);
+
         args.svg.append('svg:defs').append('svg:marker')
             .attr('id', args.id)
-            .attr('viewBox', args.viewBox || '0 -5 10 10')
-            .attr('refX', args.refX || 6)
-            .attr('markerWidth', args.markerWidth || 5)
-            .attr('markerHeight', args.markerHeight || 5)
+            .attr('viewBox', args.view_box || '0 -5 10 10')
+            .attr('refX', args.ref_x || 6)
+            .attr('markerWidth', this.marker_width)
+            .attr('markerHeight', this.marker_height)
             .attr('orient', args.orient || 'auto')
             .append('svg:path')
             .attr('d', args.d || 'M0,-5L10,0L0,5')
             .attr('fill', args.fill || "#000");
-
-        this.url = sprintf('url(#%s)', args.id);
     },
 
     RendersHierarchy: function (args) {
@@ -27,13 +28,13 @@ c3sandbox.render = {
                                                  id: 'end-arrow-linearized',
                                                  fill: 'red'});
 
-        var offset = args.offset || 50;
+        var rank_fuzz = args.rank_fuzz || 10, offset = rank_fuzz * 15;
         var radius = 22;
 
         var determine_rank = function (c) {
             if (!c.bases.length)
                 return 0;
-            return 1 + Math.min.apply(null, c.bases.map(determine_rank));
+            return 1 + Math.max.apply(null, c.bases.map(determine_rank));
         };
 
         var classes, edges;
@@ -43,7 +44,7 @@ c3sandbox.render = {
 
             classes = [], edges = [];
 
-            var key, c, ranks = {}, num_ranks = 0;
+            var key, c, ranks = {}, num_ranks = rank_fuzz;
 
             for (key in this.environment) {
                 if (!this.environment.hasOwnProperty(key))
@@ -90,19 +91,20 @@ c3sandbox.render = {
         };
 
         var translate = function (a, b, hypotenuse, fuzz) {
-            var perimeter_point = radius + (fuzz || 6);
+            var perimeter_point = radius + fuzz;
             return b + (perimeter_point * (a - b) / hypotenuse);
         };
 
         var create_link_d = function (d) {
             var h = hypotenuse(d.source, d.target);
-            var from_x = d.source.x,
-                from_y = d.source.y,
-                to_x = translate(d.source.x, d.target.x, h),
-                to_y = translate(d.source.y, d.target.y, h);
+            var fuzz = (d.linearized ? linearized_arrow.marker_width : normal_arrow.marker_width),
+                from_x = d.source.x - (radius * (d.source.x - d.target.x) / h),
+                from_y = d.source.y - (radius * (d.source.y - d.target.y) / h),
+                to_x = d.target.x + ((radius + fuzz) * (d.source.x - d.target.x) / h),
+                to_y = d.target.y + ((radius + fuzz) * (d.source.y - d.target.y) / h);
             if (d.linearized)
                 return sprintf(['M%f,%f', 'A%f,%f 0 0,1 %f,%f'].join(''),
-                               from_x, from_y, h, h, to_x, to_y);
+                               from_x, from_y, h / 2, h / 2, to_x, to_y);
             return sprintf(['M%f,%f', 'L%f,%f'].join(''),
                            from_x, from_y, to_x, to_y);
         };
@@ -170,7 +172,7 @@ c3sandbox.render = {
             }).start();
 
             var safety = 0;
-            while (this.force.alpha() > 0.05) {
+            while (this.force.alpha() > 0.03) {
                 this.force.tick();
                 ++safety;
                 if (safety > 500)

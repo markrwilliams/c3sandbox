@@ -1,18 +1,18 @@
 .link-edge {
     fill: none;
-    stroke: #777;
+    stroke: black;
     stroke-width: 3;
 }
 
 .linearized-edge {
     fill: none;
     stroke: red;
-    stroke-width: 3;
-    opacity: .7
+    stroke-width: 2;
 }
 
 .linearized-arrow {
     stroke: red;
+    stroke-width: 2;
 }
 
 .class-node-circle {
@@ -22,7 +22,7 @@
 
 
 text {
-    font: 12px sans-serif;
+    font-family: monospace;
 }
 
 text.node-text {
