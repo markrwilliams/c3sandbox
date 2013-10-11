@@ -202,7 +202,7 @@ c3sandbox.render = {
             }).start();
 
             var safety = 0;
-            while (this.force.alpha() > 0.05) {
+            while (this.force.alpha() > 0.005) {
                 this.force.tick();
                 ++safety;
                 if (safety > 500)
